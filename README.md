@@ -19,22 +19,23 @@ lines with a fixed with and and a specified color. Single player NES-style input
 
 | **function name** | function |
 |------------------------------------------------|---------------------------------------------------|
-| **vectron_setPosition(f32 x, f32 y)** | Sets the pointer/cursor/electron beam to the given position. |
-| **vectron_drawLineTo(f32 x, f32 y)** | Draws a line between the current position and the gven position. The current position is set to the given position. |
-| **vectron_setColor(i32)** | Sets the current color to the given value (RGBA). |
-| **vectron_clear(i32)** | Clears the screen with the given color (RGBA). Usually called before any drawing for the current frame is done. |
-| **vectron_translate(f32 x, f32 y)** | Translates the screen transform by the given amount. |
-| **vectron_scale(f32 x, f32 y)** | Scales the screen transform by the given amount. |
-| **vectron_rotate(f32 angle)** | Rotates the screen transform by the given amount (angle is in radiants).
-| **vectron_setTransform(f32 m_00, f32 m_01, f32 m_10, f32 m_11, f32 m_20, f32 m_21)** | Sets the screen transform to the given values. The screen transform is a 3x3 column major matrix. **NOTE:** In this function only the top two rows can be set. The bottom one is by default (0, 0, 1).
-| **vectron_push()** | Pushes the current screen transform on a stack, so it can be restored later. |
-| **vectron_pop()** | Pops the last added transform from the stack and sets it as the current screen transform |
-| **vectron_setWrapMode(i32)** | Sets the wrap mode of the screen. (0: none, 1: horizontal, 2: vertical, 3: horizontal and vertical). No wraping is the default.
-| **vectron_getInput()** | Gets the input as an i32 where each bit represents if a button is pressed or not. |
-| **vectron_playTone(f32 frequency, f32 duration)** | Plays a tone withe the given frequncy for the given duration (in ms). |
+| **setPosition(f32 x, f32 y)** | Sets the pointer/cursor/electron beam to the given position. |
+| **drawLineTo(f32 x, f32 y)** | Draws a line between the current position and the gven position. The current position is set to the given position. |
+| **setColor(i32)** | Sets the current color to the given value (RGBA). |
+| **clear(i32)** | Clears the screen with the given color (RGBA). Usually called before any drawing for the current frame is done. |
+| **translate(f32 x, f32 y)** | Translates the screen transform by the given amount. |
+| **scale(f32 x, f32 y)** | Scales the screen transform by the given amount. |
+| **rotate(f32 angle)** | Rotates the screen transform by the given amount (angle is in radiants).
+| **setTransform(f32 m_00, f32 m_01, f32 m_10, f32 m_11, f32 m_20, f32 m_21)** | Sets the screen transform to the given values. The screen transform is a 3x3 column major matrix. **NOTE:** In this function only the top two rows can be set. The bottom one is by default (0, 0, 1).
+| **push()** | Pushes the current screen transform on a stack, so it can be restored later. |
+| **pop()** | Pops the last added transform from the stack and sets it as the current screen transform |
+| **setWrapMode(i32 mode)** | Sets the wrap mode of the screen. (0: none, 1: horizontal, 2: vertical, 3: horizontal and vertical). No wraping is the default.
+| **getInput()** | Gets the input as an i32 where each bit represents if a button is pressed or not. |
+| **playTone(f32 frequency, f32 duration)** | Plays a tone withe the given frequncy for the given duration (in ms). |
+
 
 ## exportable function
 
 | **function name** | function |
 |---|---|
-| **vectron_update()** | This function is called 60 times per second by the runtime. |
+| **update()** | This function is called 60 times per second by the runtime. |
