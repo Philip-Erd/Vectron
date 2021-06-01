@@ -5,3 +5,6 @@ CFLAGS = -s EXPORTED_FUNCTIONS='["update"]' -s WASM=1 -s SIDE_MODULE=1 -O2
 
 simple: simple.c
 	${CC} ${CFLAGS} -o simple.wasm simple.c
+
+line: line.c vectron.h
+	${CC} ${CFLAGS} -o line.wasm line.c

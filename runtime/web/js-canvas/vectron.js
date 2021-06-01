@@ -1,11 +1,18 @@
 "use strict"
+//config
+const updateTime = 1000;
+
+//runtime
 let vectron_canvas;
 let vectron_canvasContext;
 
 let vectron_game_instance;
 let vectron_game_exports;
 
-let vectron_lineColor = "#00FF00";
+
+//machine values
+let vectron_lineColor = "#00FF00FF";
+let vectron_position = {x: 0.0, y: 0.0};
 
 var start = vectron_init;
 
@@ -31,12 +38,13 @@ function vectron_init() {
     //canvas
     vectron_canvas = document.getElementById("canvas");
     vectron_canvasContext = vectron_canvas.getContext("2d");
+    vectron_canvasContext.strokeStyle = vectron_lineColor;
 
     //WASM
-    WebAssembly.compileStreaming(fetch("simple.wasm"))
+    WebAssembly.compileStreaming(fetch("line.wasm"))
     .then(module => WebAssembly.instantiate(module, vectron_importObject))
     .then((instance)=> {
-        window.setInterval(vectron_update, 16);
+        window.setInterval(vectron_update, updateTime);
         vectron_game_instance = instance;
         vectron_game_exports = instance.exports;
     });
@@ -45,19 +53,33 @@ function vectron_init() {
 
 
 function vectron_update(){
+    vectron_canvasContext.beginPath();
     vectron_game_instance.exports.update();
+    vectron_canvasContext.stroke();
+
 }
 
 function vectron_setPosition(x, y) {
+    vectron_position.x = x;
+    vectron_position.y = y;
 
+    let newCoords = vectron_toCanvasCoords(vectron_position.x, vectron_position.y);  
+    vectron_canvasContext.moveTo(newCoords.x, newCoords.y);
+    console.log("position: " + vectron_position.x + ", " + vectron_position.y);
 }
 
 function vectron_drawLineTo(x, y){
 
+    let newCoords = vectron_toCanvasCoords(x, y);
+    vectron_canvasContext.lineTo(newCoords.x, newCoords.y);
+    vectron_position.x = newCoords.x;
+    vectron_position.y = newCoords.y;
+
 }
 
 function vectron_setColor(color) {
-    console.log("color called");
+    vectron_lineColor = color;
+    vectron_canvasContext.strokeStyle = color;
 }
 
 function vectron_clear(color) {
@@ -101,4 +123,14 @@ function vectron_getInput(){
 
 function vectron_playTone(frequency, duration){
 
+}
+
+
+function vectron_toCanvasCoords(x, y){
+
+    //TODO: transfor matrix
+
+    let newx = x*vectron_canvas.width;
+    let newy = y*vectron_canvas.height;
+    return {x : newx, y: newy};
 }
