@@ -10,7 +10,7 @@ let vectron_lineColor = "#00FF00";
 var start = vectron_init;
 
 let vectron_importObject = {
-    vectron: {
+    env: {
         setPosition: vectron_setPosition,
         drawLineTo: vectron_drawLineTo,
         setColor: vectron_setColor,
@@ -33,7 +33,7 @@ function vectron_init() {
     vectron_canvasContext = vectron_canvas.getContext("2d");
 
     //WASM
-    WebAssembly.compileStreaming(fetch("test.wasm"))
+    WebAssembly.compileStreaming(fetch("simple.wasm"))
     .then(module => WebAssembly.instantiate(module, vectron_importObject))
     .then((instance)=> {
         window.setInterval(vectron_update, 16);
@@ -57,7 +57,7 @@ function vectron_drawLineTo(x, y){
 }
 
 function vectron_setColor(color) {
-    
+    console.log("color called");
 }
 
 function vectron_clear(color) {

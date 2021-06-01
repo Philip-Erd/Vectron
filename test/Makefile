@@ -1,0 +1,7 @@
+#using dockcross/web-wasm
+#This makefile runs inside the container
+
+CFLAGS = -s EXPORTED_FUNCTIONS='["update"]' -s WASM=1 -s SIDE_MODULE=1 -O2
+
+simple: simple.c
+	${CC} ${CFLAGS} -o simple.wasm simple.c
