@@ -8,3 +8,6 @@ simple: simple.c
 
 line: line.c vectron.h
 	${CC} ${CFLAGS} -o line.wasm line.c
+
+color: color.c vectron.h
+	${CC} ${CFLAGS} -o color.wasm color.c

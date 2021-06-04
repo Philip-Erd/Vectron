@@ -17,5 +17,7 @@ extern void playTone(float frequncy, float duration);
 #define RED 0xFF0000FF
 #define GREEN 0x00FF00FF
 #define BLUE 0x0000FFFF
+#define YELLOW 0xFFFF00FF
+#define GREY 0xAAAAAAFF
 #define BLACK 0x000000FF
 #define WHITE 0xFFFFFFFF
