@@ -6,6 +6,9 @@ const updateTime = 16;
 let vectron_canvas;
 let vectron_canvasContext;
 
+let vectron_audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let vectron_mainGain = null;
+
 let vectron_game_instance;
 let vectron_game_exports;
 let vectron_game_memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
@@ -46,12 +49,17 @@ function vectron_intern_init() {
     vectron_canvasContext = vectron_canvas.getContext("2d");
     vectron_canvasContext.strokeStyle = vectron_lineColor;
 
+    //matrix stack
     vectron_matrixStack.push(vectron_createMatrix(1, 0, 0, 0, 1, 0, 0, 0, 1));
     vectron_currentMatrix = vectron_matrixStack.pop();
-    //console.log(vectron_currentMatrix);
+    
+    //audio
+    vectron_mainGain = vectron_audioContext.createGain();
+    vectron_mainGain.connect(vectron_audioContext.destination);
+    vectron_mainGain.gain.value = 0.5;
 
     //WASM
-    WebAssembly.compileStreaming(fetch("transform.wasm"))
+    WebAssembly.compileStreaming(fetch("audio.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             vectron_game_instance = instance;
@@ -141,10 +149,20 @@ function vectron_setWrapMode(mode) {
 }
 
 function vectron_getInput() {
-
+    //navigator.getGamepads
 }
 
 function vectron_playTone(frequency, duration) {
+    let osc = vectron_audioContext.createOscillator();
+    osc.connect(vectron_mainGain);
+
+    osc.type = "sine";
+    osc.frequency.value = frequency;
+    osc.start();
+
+    setTimeout(() => {
+        osc.stop();
+    }, duration);
 
 }
 
