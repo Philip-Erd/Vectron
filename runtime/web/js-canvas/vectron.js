@@ -51,7 +51,7 @@ function vectron_intern_init() {
     //console.log(vectron_currentMatrix);
 
     //WASM
-    WebAssembly.compileStreaming(fetch("scale.wasm"))
+    WebAssembly.compileStreaming(fetch("rotation.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             window.setInterval(vectron_update, updateTime);
@@ -109,7 +109,8 @@ function vectron_scale(x, y) {
 }
 
 function vectron_rotate(angle) {
-
+    let rotation = vectron_createMatrix(Math.cos(angle), -Math.sin(angle), 0, Math.sin(angle), Math.cos(angle), 0, 0, 0, 1);
+    vectron_currentMatrix = vectron_matrixMultiply(rotation, vectron_currentMatrix);
 }
 
 function vectron_setTransform(m_00, m_01, m_10, m_11, m_20, m_21) {
