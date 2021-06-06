@@ -1,6 +1,6 @@
 "use strict"
 //config
-const updateTime = 1000;
+const updateTime = 16;
 
 //runtime
 let vectron_canvas;
@@ -51,7 +51,7 @@ function vectron_intern_init() {
     //console.log(vectron_currentMatrix);
 
     //WASM
-    WebAssembly.compileStreaming(fetch("rotation.wasm"))
+    WebAssembly.compileStreaming(fetch("transform.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             vectron_game_instance = instance;

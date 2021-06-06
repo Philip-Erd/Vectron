@@ -3,7 +3,7 @@
 
 CFLAGS = -s EXPORTED_FUNCTIONS='["update", "init"]' -s WASM=1 -s SIDE_MODULE=1 -O2
 
-all: simple line color translation scale rotation
+all: simple line color translation scale rotation transform
 
 simple: simple.c
 	${CC} ${CFLAGS} -o simple.wasm simple.c
@@ -22,3 +22,6 @@ scale: scale.c vectron.h
 
 rotation: rotation.c vectron.h
 	${CC} ${CFLAGS} -o rotation.wasm rotation.c
+
+transform: transform.c vectron.h
+	${CC} ${CFLAGS} -o transform.wasm transform.c
