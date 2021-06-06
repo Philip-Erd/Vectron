@@ -38,4 +38,5 @@ lines with a fixed with and and a specified color. Single player NES-style input
 
 | **function name** | function |
 |---|---|
+| **init()** | This function is called once at the beginning. (before the first call of update) |
 | **update()** | This function is called 60 times per second by the runtime. |

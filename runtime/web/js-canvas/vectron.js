@@ -54,9 +54,16 @@ function vectron_intern_init() {
     WebAssembly.compileStreaming(fetch("rotation.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
-            window.setInterval(vectron_update, updateTime);
             vectron_game_instance = instance;
             vectron_game_exports = instance.exports;
+
+            if (typeof vectron_game_exports.init != "undefined") {
+                vectron_game_exports.init();
+            }
+
+            if (typeof vectron_game_exports.update != "undefined") {
+                window.setInterval(vectron_update, updateTime);
+            }
         });
 
 }
@@ -122,9 +129,9 @@ function vectron_push() {
 }
 
 function vectron_pop() {
-    if(vectron_matrixStack.length > 0){
+    if (vectron_matrixStack.length > 0) {
         vectron_currentMatrix = vectron_matrixStack.pop();
-    }else{
+    } else {
         console.error("[VECTRON] matrix_stack is empty");
     }
 }
@@ -163,7 +170,7 @@ function vectron_toColor(num) {
     return "rgba(" + [r, g, b, a].join(",") + ")";
 }
 
-function vectron_createMatrix(m_00, m_01, m_02, m_10, m_11, m_12, m_20, m_21, m_22){
+function vectron_createMatrix(m_00, m_01, m_02, m_10, m_11, m_12, m_20, m_21, m_22) {
     return {
         m_00: m_00,
         m_01: m_01,
@@ -177,7 +184,7 @@ function vectron_createMatrix(m_00, m_01, m_02, m_10, m_11, m_12, m_20, m_21, m_
     };
 }
 
-function vectron_createVector(x, y, z){
+function vectron_createVector(x, y, z) {
     return {
         x: x,
         y: y,
@@ -185,7 +192,7 @@ function vectron_createVector(x, y, z){
     };
 }
 
-function vectron_matrixMultiply(a, b){
+function vectron_matrixMultiply(a, b) {
     return {
         m_00: (a.m_00 * b.m_00) + (a.m_10 * b.m_01) + (a.m_20 * b.m_02),
         m_01: (a.m_01 * b.m_00) + (a.m_11 * b.m_01) + (a.m_21 * b.m_02),
@@ -201,8 +208,8 @@ function vectron_matrixMultiply(a, b){
     };
 }
 
-function vectron_vectorMultiply(matrix, vector){
-    return{
+function vectron_vectorMultiply(matrix, vector) {
+    return {
         x: (matrix.m_00 * vector.x) + (matrix.m_10 * vector.y) + (matrix.m_20 * vector.z),
         y: (matrix.m_01 * vector.x) + (matrix.m_11 * vector.y) + (matrix.m_21 * vector.z),
         z: (matrix.m_02 * vector.x) + (matrix.m_12 * vector.y) + (matrix.m_22 * vector.z)
