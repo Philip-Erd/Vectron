@@ -14,3 +14,9 @@ color: color.c vectron.h
 
 translation: translation.c vectron.h
 	${CC} ${CFLAGS} -o translation.wasm translation.c
+
+scale: scale.c vectron.h
+	${CC} ${CFLAGS} -o scale.wasm scale.c
+
+rotation: rotation.c vectron.h
+	${CC} ${CFLAGS} -o rotation.wasm rotation.c

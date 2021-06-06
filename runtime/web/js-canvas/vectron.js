@@ -16,7 +16,7 @@ let vectron_position = vectron_createVector(0, 0, 1);
 let vectron_currentMatrix;
 let vectron_matrixStack = [];
 
-var start = vectron_init;
+var start = vectron_intern_init;
 
 let vectron_importObject = {
     //emscripten style
@@ -39,7 +39,7 @@ let vectron_importObject = {
     }
 }
 
-function vectron_init() {
+function vectron_intern_init() {
 
     //canvas
     vectron_canvas = document.getElementById("canvas");
@@ -51,7 +51,7 @@ function vectron_init() {
     //console.log(vectron_currentMatrix);
 
     //WASM
-    WebAssembly.compileStreaming(fetch("translation.wasm"))
+    WebAssembly.compileStreaming(fetch("scale.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             window.setInterval(vectron_update, updateTime);
@@ -73,8 +73,6 @@ function vectron_setPosition(x, y) {
 }
 
 function vectron_drawLineTo(x, y) {
-
-    //console.log(vectron_currentMatrix);
 
     let newCoords = vectron_toCanvasCoords(vectron_createVector(x, y, 1));
     let newPosCoords = vectron_toCanvasCoords(vectron_position);
@@ -102,13 +100,12 @@ function vectron_clear(color) {
 
 function vectron_translate(x, y) {
     let translation = vectron_createMatrix(1, 0, 0, 0, 1, 0, x, y, 1);
-    //console.log(translation);
     vectron_currentMatrix = vectron_matrixMultiply(translation, vectron_currentMatrix);
-    console.log(vectron_currentMatrix);
 }
 
 function vectron_scale(x, y) {
-
+    let scale = vectron_createMatrix(x, 0, 0, 0, y, 0, 0, 0, 1);
+    vectron_currentMatrix = vectron_matrixMultiply(scale, vectron_currentMatrix);
 }
 
 function vectron_rotate(angle) {
