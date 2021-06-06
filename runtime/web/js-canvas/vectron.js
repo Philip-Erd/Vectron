@@ -5,8 +5,6 @@ const updateTime = 1000;
 //runtime
 let vectron_canvas;
 let vectron_canvasContext;
-let vectron_currentMatrix;
-let vectron_matrixStack = [];
 
 let vectron_game_instance;
 let vectron_game_exports;
@@ -15,6 +13,8 @@ let vectron_game_memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
 //machine values
 let vectron_lineColor = "rgba(0, 255, 0, 255)";
 let vectron_position = vectron_createVector(0, 0, 1);
+let vectron_currentMatrix;
+let vectron_matrixStack = [];
 
 var start = vectron_init;
 
@@ -48,9 +48,10 @@ function vectron_init() {
 
     vectron_matrixStack.push(vectron_createMatrix(1, 0, 0, 0, 1, 0, 0, 0, 1));
     vectron_currentMatrix = vectron_matrixStack.pop();
+    //console.log(vectron_currentMatrix);
 
     //WASM
-    WebAssembly.compileStreaming(fetch("line.wasm"))
+    WebAssembly.compileStreaming(fetch("translation.wasm"))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             window.setInterval(vectron_update, updateTime);
@@ -72,6 +73,8 @@ function vectron_setPosition(x, y) {
 }
 
 function vectron_drawLineTo(x, y) {
+
+    //console.log(vectron_currentMatrix);
 
     let newCoords = vectron_toCanvasCoords(vectron_createVector(x, y, 1));
     let newPosCoords = vectron_toCanvasCoords(vectron_position);
@@ -98,7 +101,10 @@ function vectron_clear(color) {
 }
 
 function vectron_translate(x, y) {
-
+    let translation = vectron_createMatrix(1, 0, 0, 0, 1, 0, x, y, 1);
+    //console.log(translation);
+    vectron_currentMatrix = vectron_matrixMultiply(translation, vectron_currentMatrix);
+    console.log(vectron_currentMatrix);
 }
 
 function vectron_scale(x, y) {
@@ -120,6 +126,8 @@ function vectron_push() {
 function vectron_pop() {
     if(vectron_matrixStack.length > 0){
         vectron_currentMatrix = vectron_matrixStack.pop();
+    }else{
+        console.error("[VECTRON] matrix_stack is empty");
     }
 }
 
@@ -138,9 +146,10 @@ function vectron_playTone(frequency, duration) {
 
 function vectron_toCanvasCoords(vector) {
 
-    //TODO: transform matrix
+    //transform matrix
     let newVector = vectron_vectorMultiply(vectron_currentMatrix, vector);
 
+    //to screen coordinates
     newVector.x = newVector.x * vectron_canvas.width;
     newVector.y = newVector.y * vectron_canvas.height;
 
@@ -181,13 +190,15 @@ function vectron_createVector(x, y, z){
 function vectron_matrixMultiply(a, b){
     return {
         m_00: (a.m_00 * b.m_00) + (a.m_10 * b.m_01) + (a.m_20 * b.m_02),
-        m_01: (a.m_00 * b.m_10) + (a.m_10 * b.m_11) + (a.m_20 * b.m_12),
-        m_02: (a.m_00 * b.m_20) + (a.m_10 * b.m_21) + (a.m_20 * b.m_22),
-        m_10: (a.m_01 * b.m_00) + (a.m_11 * b.m_01) + (a.m_21 * b.m_02),
+        m_01: (a.m_01 * b.m_00) + (a.m_11 * b.m_01) + (a.m_21 * b.m_02),
+        m_02: (a.m_02 * b.m_00) + (a.m_12 * b.m_01) + (a.m_22 * b.m_02),
+
+        m_10: (a.m_00 * b.m_10) + (a.m_10 * b.m_11) + (a.m_20 * b.m_12),
         m_11: (a.m_01 * b.m_10) + (a.m_11 * b.m_11) + (a.m_21 * b.m_12),
-        m_12: (a.m_01 * b.m_20) + (a.m_11 * b.m_21) + (a.m_21 * b.m_22),
-        m_20: (a.m_02 * b.m_00) + (a.m_12 * b.m_01) + (a.m_22 * b.m_02),
-        m_21: (a.m_02 * b.m_10) + (a.m_12 * b.m_11) + (a.m_22 * b.m_12),
+        m_12: (a.m_02 * b.m_10) + (a.m_12 * b.m_11) + (a.m_22 * b.m_12),
+
+        m_20: (a.m_00 * b.m_20) + (a.m_10 * b.m_21) + (a.m_20 * b.m_22),
+        m_21: (a.m_01 * b.m_20) + (a.m_11 * b.m_21) + (a.m_21 * b.m_22),
         m_22: (a.m_02 * b.m_20) + (a.m_12 * b.m_21) + (a.m_22 * b.m_22)
     };
 }

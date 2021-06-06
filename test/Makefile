@@ -11,3 +11,6 @@ line: line.c vectron.h
 
 color: color.c vectron.h
 	${CC} ${CFLAGS} -o color.wasm color.c
+
+translation: translation.c vectron.h
+	${CC} ${CFLAGS} -o translation.wasm translation.c
