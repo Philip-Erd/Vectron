@@ -2,6 +2,8 @@
 
 void drawCube(void);
 
+void init(){};
+
 void update(){
 
     drawCube();

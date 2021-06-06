@@ -3,6 +3,8 @@
 
 static int col = 0;
 
+void init(){};
+
 void update(){
     
     int color;

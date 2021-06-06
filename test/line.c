@@ -1,6 +1,8 @@
 
 #include "vectron.h"
 
+void init(){};
+
 void update(){
     
     clear(BLACK);

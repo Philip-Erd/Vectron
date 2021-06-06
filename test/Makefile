@@ -1,7 +1,9 @@
 #using dockcross/web-wasm
 #This makefile runs inside the container
 
-CFLAGS = -s EXPORTED_FUNCTIONS='["update"]' -s WASM=1 -s SIDE_MODULE=1 -O2
+CFLAGS = -s EXPORTED_FUNCTIONS='["update", "init"]' -s WASM=1 -s SIDE_MODULE=1 -O2
+
+all: simple line color translation scale rotation
 
 simple: simple.c
 	${CC} ${CFLAGS} -o simple.wasm simple.c

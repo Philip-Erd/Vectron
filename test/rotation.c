@@ -2,6 +2,8 @@
 
 void drawCube();
 
+void init(){};
+
 void update(){
 
     clear(BLACK);
