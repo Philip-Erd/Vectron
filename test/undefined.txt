@@ -1,0 +1,12 @@
+setPosition
+drawLineTo
+setColor
+clear
+translate
+scale
+rotate
+setTransform
+push
+pop
+getInput
+playTone

@@ -37,7 +37,22 @@ let vectron_importObject = {
         push: vectron_push,
         pop: vectron_pop,
         getInput: vectron_getInput,
-        playTone: vectron_playTone,
+        playTone: vectron_playTone
+    },
+
+    vectron: {
+        setPosition: vectron_setPosition,
+        drawLineTo: vectron_drawLineTo,
+        setColor: vectron_setColor,
+        clear: vectron_clear,
+        translate: vectron_translate,
+        scale: vectron_scale,
+        rotate: vectron_rotate,
+        setTransform: vectron_setTransform,
+        push: vectron_push,
+        pop: vectron_pop,
+        getInput: vectron_getInput,
+        playTone: vectron_playTone
     }
 }
 

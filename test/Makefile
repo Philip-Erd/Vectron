@@ -1,7 +1,8 @@
 #using clang
 
 #CFLAGS = -s EXPORTED_FUNCTIONS='["update", "init"]' -s WASM=1 -s SIDE_MODULE=1 -O2
-CFLAGS = --target=wasm32 --no-standard-libraries -Wl,--no-entry -Wl,--export=update -Wl,--export=init -Wl,--allow-undefined -O2
+CFLAGS = --target=wasm32 -O2 --no-standard-libraries -Wl,--no-entry -Wl,--export=update -Wl,--export=init\
+		 -Wl,--allow-undefined-file=undefined.txt
 
 CC = clang
 
