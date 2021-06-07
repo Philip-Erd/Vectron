@@ -1,9 +1,15 @@
-#using dockcross/web-wasm
-#This makefile runs inside the container
+#using clang
 
-CFLAGS = -s EXPORTED_FUNCTIONS='["update", "init"]' -s WASM=1 -s SIDE_MODULE=1 -O2
+#CFLAGS = -s EXPORTED_FUNCTIONS='["update", "init"]' -s WASM=1 -s SIDE_MODULE=1 -O2
+CFLAGS = --target=wasm32 --no-standard-libraries -Wl,--no-entry -Wl,--export=update -Wl,--export=init -Wl,--allow-undefined -O2
+
+CC = clang
 
 all: simple line color translation scale rotation transform audio
+
+clean:
+	rm ./*.wasm
+	rm ./*.wat
 
 simple: simple.c
 	${CC} ${CFLAGS} -o simple.wasm simple.c

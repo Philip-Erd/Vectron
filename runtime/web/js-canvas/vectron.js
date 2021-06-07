@@ -1,6 +1,8 @@
 "use strict"
 //config
+const gameFile = "transform.wasm"
 const updateTime = 16;
+const audioWaveType = "sine";
 
 //runtime
 let vectron_canvas;
@@ -22,7 +24,7 @@ let vectron_matrixStack = [];
 var start = vectron_intern_init;
 
 let vectron_importObject = {
-    //emscripten style
+    //clang style
     env: {
         setPosition: vectron_setPosition,
         drawLineTo: vectron_drawLineTo,
@@ -36,9 +38,6 @@ let vectron_importObject = {
         pop: vectron_pop,
         getInput: vectron_getInput,
         playTone: vectron_playTone,
-
-        __memory_base: 0,
-        memory: vectron_game_memory
     }
 }
 
@@ -59,7 +58,7 @@ function vectron_intern_init() {
     vectron_mainGain.gain.value = 0.5;
 
     //WASM
-    WebAssembly.compileStreaming(fetch("audio.wasm"))
+    WebAssembly.compileStreaming(fetch(gameFile))
         .then(module => WebAssembly.instantiate(module, vectron_importObject))
         .then((instance) => {
             vectron_game_instance = instance;
@@ -156,7 +155,7 @@ function vectron_playTone(frequency, duration) {
     let osc = vectron_audioContext.createOscillator();
     osc.connect(vectron_mainGain);
 
-    osc.type = "sine";
+    osc.type = audioWaveType;
     osc.frequency.value = frequency;
     osc.start();
 
