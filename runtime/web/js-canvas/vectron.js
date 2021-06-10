@@ -1,6 +1,6 @@
 "use strict"
 //config
-const gameFile = "transform.wasm"
+const gameFile = "input.wasm"
 const updateTime = 16;
 const audioWaveType = "sine";
 
@@ -15,13 +15,24 @@ let vectron_game_instance;
 let vectron_game_exports;
 let vectron_game_memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
 
+let vectron_input = {
+    a: false,
+    b: false,
+    start: false,
+    select: false,
+    up: false,
+    down: false,
+    left: false,
+    right: false
+};
+
 //machine values
 let vectron_lineColor = "rgba(0, 255, 0, 255)";
 let vectron_position = vectron_createVector(0, 0, 1);
 let vectron_currentMatrix;
 let vectron_matrixStack = [];
 
-var start = vectron_intern_init;
+var vectron_start = vectron_intern_init;
 
 let vectron_importObject = {
     //clang style
@@ -66,11 +77,20 @@ function vectron_intern_init() {
     //matrix stack
     vectron_matrixStack.push(vectron_createMatrix(1, 0, 0, 0, 1, 0, 0, 0, 1));
     vectron_currentMatrix = vectron_matrixStack.pop();
-    
+
     //audio
     vectron_mainGain = vectron_audioContext.createGain();
     vectron_mainGain.connect(vectron_audioContext.destination);
     vectron_mainGain.gain.value = 0.5;
+
+    //input
+    document.addEventListener("keydown", (event) => {
+        vectron_keyInput(event.code, vectron_input, true);
+    });
+
+    document.addEventListener("keyup", (event) => {
+        vectron_keyInput(event.code, vectron_input, false);
+    });
 
     //WASM
     WebAssembly.compileStreaming(fetch(gameFile))
@@ -163,7 +183,56 @@ function vectron_setWrapMode(mode) {
 }
 
 function vectron_getInput() {
-    //navigator.getGamepads
+
+
+    /*gamepads
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+    
+    for (let gamepad of gamepads) {
+
+        //a
+        if (gamepad.buttons[0].pressed) {
+            a = true;
+        }
+
+        //b
+        if (gamepad.buttons[1].pressed) {
+            b = true;
+        }
+
+        //start
+        if (gamepad.buttons[7].pressed || gamepad.buttons[9].pressed) {
+            start = true;
+        }
+
+        //select
+        if (gamepad.buttons[6].pressed || gamepad.buttons[8].pressed) {
+            select = true;
+        }
+
+        //up
+        if (gamepad.buttons[12].pressed || gamepad.axis[1] < -0.3) {
+            up = true;
+        }
+
+        //down
+        if (gamepad.buttons[13].pressed || gamepad.axis[1] > 0.3) {
+            down = true;
+        }
+
+        //left
+        if (gamepad.buttons[14].pressed || gamepad.axis[1] < -0.3) {
+            a = true;
+        }
+
+        //right
+        if (gamepad.buttons[15].pressed || gamepad.axis[1] > 0.3) {
+            a = true;
+        }
+} */
+
+    return vectron_inputToNumber(vectron_input);
 }
 
 function vectron_playTone(frequency, duration) {
@@ -246,4 +315,69 @@ function vectron_vectorMultiply(matrix, vector) {
         y: (matrix.m_01 * vector.x) + (matrix.m_11 * vector.y) + (matrix.m_21 * vector.z),
         z: (matrix.m_02 * vector.x) + (matrix.m_12 * vector.y) + (matrix.m_22 * vector.z)
     };
+}
+
+function vectron_inputToNumber(input) {
+    let res = 0;
+
+    if (input.a) { res += 1 }
+    if (input.b) { res += 2 }
+    if (input.start) { res += 4 }
+    if (input.select) { res += 8 }
+    if (input.up) { res += 16 }
+    if (input.down) { res += 32 }
+    if (input.left) { res += 64 }
+    if (input.right) { res += 128 }
+
+    return res;
+}
+
+function vectron_keyInput(keycode, inputObject, value) {
+    switch (keycode) {
+        case "KeyW":
+            inputObject.up = value;
+            break;
+        case "ArrowUp":
+            inputObject.up = value;
+            break;
+
+        case "KeyS":
+            inputObject.down = value;
+            break;
+        case "ArrowDown":
+            inputObject.down = value;
+            break;
+
+        case "KeyA":
+            inputObject.left = value;
+            break;
+        case "ArrowLeft":
+            inputObject.left = value;
+            break;
+
+        case "KeyD":
+            inputObject.right = value;
+            break;
+        case "ArrowRight":
+            inputObject.right = value;
+            break;
+
+        case "KeyJ":
+            inputObject.a = value;
+            break;
+        case "KeyK":
+            inputObject.b = value;
+            break;
+
+
+        case "KeyU":
+            inputObject.start = value;
+            break;
+        case "KeyI":
+            inputObject.select = value;
+            break;
+
+        default:
+            break;
+    }
 }

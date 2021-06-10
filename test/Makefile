@@ -35,3 +35,6 @@ transform: transform.c vectron.h
 
 audio: audio.c vectron.h
 	${CC} ${CFLAGS} -o audio.wasm audio.c
+
+input: input.c vectron.h
+	${CC} ${CFLAGS} -o input.wasm input.c

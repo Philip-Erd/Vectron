@@ -21,3 +21,13 @@ extern void playTone(float frequncy, float duration);
 #define GREY 0xAAAAAAFF
 #define BLACK 0x000000FF
 #define WHITE 0xFFFFFFFF
+
+
+#define A 1
+#define B 2
+#define START 4
+#define SELECT 8
+#define UP 16
+#define DOWN 32
+#define LEFT 64
+#define RIGHT 128

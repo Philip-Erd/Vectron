@@ -20,7 +20,7 @@ lines with a fixed with and and a specified color. Single player NES-style input
 | **function name** | function |
 |------------------------------------------------|---------------------------------------------------|
 | **setPosition(f32 x, f32 y)** | Sets the pointer/cursor/electron beam to the given position. |
-| **drawLineTo(f32 x, f32 y)** | Draws a line between the current position and the gven position. The current position is set to the given position. |
+| **drawLineTo(f32 x, f32 y)** | Draws a line between the current position and the given position. The current position is set to the given position. |
 | **setColor(i32)** | Sets the current color to the given value (RGBA). |
 | **clear(i32)** | Clears the screen with the given color (RGBA). Usually called before any drawing for the current frame is done. |
 | **translate(f32 x, f32 y)** | Translates the screen transform by the given amount. |
@@ -30,8 +30,8 @@ lines with a fixed with and and a specified color. Single player NES-style input
 | **push()** | Pushes the current screen transform on a stack, so it can be restored later. |
 | **pop()** | Pops the last added transform from the stack and sets it as the current screen transform |
 | **setWrapMode(i32 mode)** | Sets the wrap mode of the screen. (0: none, 1: horizontal, 2: vertical, 3: horizontal and vertical). No wraping is the default.
-| **getInput()** | Gets the input as an i32 where each bit represents if a button is pressed or not. |
-| **playTone(f32 frequency, f32 duration)** | Plays a tone withe the given frequncy for the given duration (in ms). |
+| **getInput()** | Gets the input as an i32 where each bit represents if a button is pressed or not. A is represented by the least significant bit and the other buttons in the following order B START SELECT UP DOWN LEFT RIGHT |
+| **playTone(f32 frequency, f32 duration)** | Plays a tone withe the given frequency for the given duration (in ms). |
 
 
 ## exportable function
@@ -40,3 +40,20 @@ lines with a fixed with and and a specified color. Single player NES-style input
 |---|---|
 | **init()** | This function is called once at the beginning. (before the first call of update) |
 | **update()** | This function is called 60 times per second by the runtime. |
+
+
+## Input
+
+The normal input methode should be gamepad with it's buttons map to something as close as possible
+to a NES pad. For convenience there is also keyboard input:
+
+| keyboard key | button |
+|--------------|--------|
+| W or ArrowUp | up |
+| S or ArrowDown | down |
+| A or ArrowLeft | left |
+| D or ArrowRight | right |
+| J | A |
+| K | B |
+| U | start |
+| I | select |
