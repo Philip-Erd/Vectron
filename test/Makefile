@@ -38,3 +38,6 @@ audio: audio.c vectron.h
 
 input: input.c vectron.h
 	${CC} ${CFLAGS} -o input.wasm input.c
+
+wrapping: wrapping.c vectron.h
+	${CC} ${CFLAGS} -o wrapping.wasm wrapping.c

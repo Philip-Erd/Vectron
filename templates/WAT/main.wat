@@ -1,0 +1,37 @@
+(module
+    (type (;0;) (func (param f32 f32)))
+    (type (;1;) (func))
+    (type (;2;) (func (param i32)))
+    (type (;3;) (func (param f32)))
+    (type (;4;) (func (result i32)))
+    (type (;5;) (func (param f32 f32 f32 f32 f32 f32)))
+
+    (import "env" "setPosition" (func $setPosition (type 0)))
+    (import "env" "drawLineTo" (func $drawLineTo (type 0)))
+    (import "env" "setColor" (func $setColor (type 2)))
+    (import "env" "clear" (func $clear (type 2)))
+    (import "env" "translate" (func $translate (type 0)))
+    (import "env" "scale" (func $scale (type 0)))
+    (import "env" "rotate" (func $rotate (type 3)))
+    (import "env" "setTransform" (func $setTransform (type 5)))
+    (import "env" "push" (func $push (type 1)))
+    (import "env" "pop" (func $pop (type 1)))
+    (import "env" "setWrapMode" (func $setWrapMode (type 2)))
+    (import "env" "getInput" (func $getInput (type 4)))
+    (import "env" "playTone" (func $playTone (type 0)))
+
+    (;called once at the beginning;)
+    (func $init (type 1)
+        return)
+
+    (;called 60 times a second;)
+    (func $update (type 1)
+        return)
+
+    (;not necessary, but you probably want to use it;)
+    (memory (;0;) 2)
+
+    (export "memory" (memory 0))
+    (export "init" (func $init))
+    (export "update" (func $update))
+    )

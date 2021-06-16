@@ -14,6 +14,7 @@ extern void setWrapMode(int mode);
 extern int getInput();
 extern void playTone(float frequency, float duration);
 
+//colors
 #define RED 0xFF0000FF
 #define GREEN 0x00FF00FF
 #define BLUE 0x0000FFFF
@@ -22,7 +23,7 @@ extern void playTone(float frequency, float duration);
 #define BLACK 0x000000FF
 #define WHITE 0xFFFFFFFF
 
-
+//input
 #define A 1
 #define B 2
 #define START 4
@@ -32,7 +33,7 @@ extern void playTone(float frequency, float duration);
 #define LEFT 64
 #define RIGHT 128
 
-
+//wrap modes
 #define WRAP_OFF 0
 #define WRAP_HORIZONTAL 1
 #define WRAP_VERTICAL 2
