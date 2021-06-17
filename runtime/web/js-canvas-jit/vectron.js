@@ -1,6 +1,6 @@
 "use strict"
 //config
-const gameFile = "input.wasm"
+const gameFile = "wrapping.wasm"
 const updateTime = 16;
 const audioWaveType = "sine";
 
@@ -15,6 +15,14 @@ let vectron_game_instance;
 let vectron_game_exports;
 let vectron_game_memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
 
+
+
+//machine values
+let vectron_lineColor = "rgba(0, 255, 0, 255)";
+let vectron_position = vectron_createVector(0, 0, 1);
+let vectron_currentMatrix;
+let vectron_matrixStack = [];
+let vectron_wrapMode = 0;
 let vectron_input = {
     a: false,
     b: false,
@@ -26,16 +34,9 @@ let vectron_input = {
     right: false
 };
 
-//machine values
-let vectron_lineColor = "rgba(0, 255, 0, 255)";
-let vectron_position = vectron_createVector(0, 0, 1);
-let vectron_currentMatrix;
-let vectron_matrixStack = [];
-
 var vectron_start = vectron_intern_init;
 
 let vectron_importObject = {
-    //clang style
     env: {
         setPosition: vectron_setPosition,
         drawLineTo: vectron_drawLineTo,
@@ -47,6 +48,7 @@ let vectron_importObject = {
         setTransform: vectron_setTransform,
         push: vectron_push,
         pop: vectron_pop,
+        setWrapMode: vectron_setWrapMode,
         getInput: vectron_getInput,
         playTone: vectron_playTone
     },
@@ -62,6 +64,7 @@ let vectron_importObject = {
         setTransform: vectron_setTransform,
         push: vectron_push,
         pop: vectron_pop,
+        setWrapMode: vectron_setWrapMode,
         getInput: vectron_getInput,
         playTone: vectron_playTone
     }
@@ -126,10 +129,18 @@ function vectron_drawLineTo(x, y) {
     let newCoords = vectron_toCanvasCoords(vectron_createVector(x, y, 1));
     let newPosCoords = vectron_toCanvasCoords(vectron_position);
 
+    //wrapping
+    let lines = vectron_wrapLine(newPosCoords, newCoords);
+
     vectron_canvasContext.beginPath();
-    vectron_canvasContext.moveTo(newPosCoords.x, newPosCoords.y);
-    vectron_canvasContext.lineTo(newCoords.x, newCoords.y);
+    for (let l of lines) {
+
+        vectron_canvasContext.moveTo(l.start.x, l.start.y);
+        vectron_canvasContext.lineTo(l.end.x, l.end.y);
+
+    }
     vectron_canvasContext.stroke();
+
 
     vectron_position.x = x;
     vectron_position.y = y;
@@ -179,59 +190,14 @@ function vectron_pop() {
 }
 
 function vectron_setWrapMode(mode) {
-
+    if (mode <= 3 && mode >= 0) {
+        vectron_wrapMode = mode;
+    } else {
+        console.error("[VECTRON] wrap mode " + mode + "is not valid");
+    }
 }
 
 function vectron_getInput() {
-
-
-    /*gamepads
-    var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-
-    
-    for (let gamepad of gamepads) {
-
-        //a
-        if (gamepad.buttons[0].pressed) {
-            a = true;
-        }
-
-        //b
-        if (gamepad.buttons[1].pressed) {
-            b = true;
-        }
-
-        //start
-        if (gamepad.buttons[7].pressed || gamepad.buttons[9].pressed) {
-            start = true;
-        }
-
-        //select
-        if (gamepad.buttons[6].pressed || gamepad.buttons[8].pressed) {
-            select = true;
-        }
-
-        //up
-        if (gamepad.buttons[12].pressed || gamepad.axis[1] < -0.3) {
-            up = true;
-        }
-
-        //down
-        if (gamepad.buttons[13].pressed || gamepad.axis[1] > 0.3) {
-            down = true;
-        }
-
-        //left
-        if (gamepad.buttons[14].pressed || gamepad.axis[1] < -0.3) {
-            a = true;
-        }
-
-        //right
-        if (gamepad.buttons[15].pressed || gamepad.axis[1] > 0.3) {
-            a = true;
-        }
-} */
-
     return vectron_inputToNumber(vectron_input);
 }
 
@@ -249,7 +215,7 @@ function vectron_playTone(frequency, duration) {
 
 }
 
-
+//transforms the given vector and converts the coordinates to the screen space
 function vectron_toCanvasCoords(vector) {
 
     //transform matrix
@@ -262,6 +228,7 @@ function vectron_toCanvasCoords(vector) {
     return newVector;
 }
 
+//converts a 32bit integer to an rgba-string
 function vectron_toColor(num) {
     num >>>= 0;
     var a = num & 0xFF,
@@ -271,6 +238,7 @@ function vectron_toColor(num) {
     return "rgba(" + [r, g, b, a].join(",") + ")";
 }
 
+//creates a 3x3 matrix (column major)
 function vectron_createMatrix(m_00, m_01, m_02, m_10, m_11, m_12, m_20, m_21, m_22) {
     return {
         m_00: m_00,
@@ -285,6 +253,7 @@ function vectron_createMatrix(m_00, m_01, m_02, m_10, m_11, m_12, m_20, m_21, m_
     };
 }
 
+//creates a 3d vector
 function vectron_createVector(x, y, z) {
     return {
         x: x,
@@ -293,6 +262,7 @@ function vectron_createVector(x, y, z) {
     };
 }
 
+//multiplies the to given matrices
 function vectron_matrixMultiply(a, b) {
     return {
         m_00: (a.m_00 * b.m_00) + (a.m_10 * b.m_01) + (a.m_20 * b.m_02),
@@ -309,6 +279,110 @@ function vectron_matrixMultiply(a, b) {
     };
 }
 
+
+
+function vectron_wrapLine(start, end) {
+    let lines = [];
+
+    let offsetX;
+    let offsetY;
+
+    switch (vectron_wrapMode) {
+        //no wrapping
+        case 0:
+            lines.push({
+                start: vectron_createVector(start.x, start.y, start.z),
+                end: vectron_createVector(end.x, end.y, end.z)
+            });
+            break;
+
+        //horizontal wrapping
+        case 1:
+
+            offsetX = Math.max( (Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
+                                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
+            start.x -= offsetX;
+            end.x -= offsetX;
+
+            while (start.x < vectron_canvas.width || end.x < vectron_canvas.width) {
+                lines.push({
+                    start: vectron_createVector(start.x, start.y, start.z),
+                    end: vectron_createVector(end.x, end.y, end.z)
+                });
+                start.x += vectron_canvas.width;
+                end.x += vectron_canvas.width;
+            }
+
+            break;
+        
+        //vertical wrapping
+        case 2:
+
+
+            offsetY = Math.max( (Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
+                                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
+
+            start.y -= offsetY;
+            end.y -= offsetY;
+
+            while (start.y < vectron_canvas.height || end.y < vectron_canvas.height) {
+                lines.push({
+                    start: vectron_createVector(start.x, start.y, start.z),
+                    end: vectron_createVector(end.x, end.y, end.z)
+                });
+                start.y += vectron_canvas.height;
+                end.y += vectron_canvas.height;
+            }
+
+            break;
+
+        //horizontal and vertical wrapping
+        case 3:
+
+
+            //offsets
+            offsetX = Math.max( (Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
+                                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
+
+            offsetY = Math.max( (Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
+                                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
+
+            start.x -= offsetX;
+            end.x -= offsetX;
+
+            start.y -= offsetY;
+            end.y -= offsetY;
+
+            let startX = start.x;
+            let endX = end.x;
+
+            while(start.y < vectron_canvas.height || end.y < vectron_canvas.height){
+                while(start.x < vectron_canvas.width || end.x < vectron_canvas.width){
+                    lines.push({
+                        start: vectron_createVector(start.x, start.y, start.z),
+                        end: vectron_createVector(end.x, end.y, end.z)
+                    });
+
+                    start.x += vectron_canvas.width;
+                    end.x += vectron_canvas.width;
+                }
+
+                //reset x coordinates
+                start.x = startX;
+                end.x = endX
+                
+
+                start.y += vectron_canvas.height;
+                end.y += vectron_canvas.height;
+            }
+
+            break;
+    }
+
+    return lines;
+}
+
+//multiplies the given vector with the given matrix
 function vectron_vectorMultiply(matrix, vector) {
     return {
         x: (matrix.m_00 * vector.x) + (matrix.m_10 * vector.y) + (matrix.m_20 * vector.z),
@@ -317,6 +391,7 @@ function vectron_vectorMultiply(matrix, vector) {
     };
 }
 
+//Converts the input object in to a 32bit integer, which is required by the input function.
 function vectron_inputToNumber(input) {
     let res = 0;
 
@@ -332,6 +407,10 @@ function vectron_inputToNumber(input) {
     return res;
 }
 
+
+
+
+//maps the keycode on to the given input object. value is if the key is pressed
 function vectron_keyInput(keycode, inputObject, value) {
     switch (keycode) {
         case "KeyW":
