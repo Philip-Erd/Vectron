@@ -1,6 +1,10 @@
 "use strict"
+
 //config
-let gameFile = "wrapping.wasm"
+
+
+
+let gameFile = null;
 let updateTime = 16;
 let audioWaveType = "sine";
 
@@ -63,6 +67,7 @@ function vectron_intern_init() {
     //canvas
     vectron_canvas = document.getElementById("canvas");
     vectron_canvasContext = vectron_canvas.getContext("2d");
+    vectron_lineColor = "rgba(0, 255, 0, 255)";
     vectron_canvasContext.strokeStyle = vectron_lineColor;
 
     //matrix stack
@@ -85,8 +90,7 @@ function vectron_intern_init() {
 
     //WASM
 
-    fetch(gameFile).then(response => response.arrayBuffer())
-        .then(bytes => WebAssembly.instantiate(bytes, vectron_importObject))
+    WebAssembly.instantiate(gameFile, vectron_importObject)
         .then((result) => {
 
             if (typeof result != "undefined") {
@@ -100,7 +104,7 @@ function vectron_intern_init() {
                 if (typeof vectron_game_instance.exports.update != "undefined") {
                     window.setInterval(vectron_update, updateTime);
                 }
-            }else{
+            } else {
                 window.alert("could not compile WASM file");
             }
         });

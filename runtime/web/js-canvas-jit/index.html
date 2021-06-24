@@ -1,17 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="vectron.js"></script>
+    <link rel="stylesheet" href="w3.css">
     <title>Vectron</title>
 </head>
-<body style="background-color: grey;">
-    <canvas id="canvas" width="512" height="512" style="background-color: black;"></canvas>
+
+<body class="w3-grey" onresize="resize()" ondrop="onDrop(event)">
+
+
+
+
+
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="w3-sidebar w3-bar-block" style="display:none">
+
+
+        <button class="w3-button w3-block w3-left-align" onclick="w3_sidebar_close()">Close &times;</button>
+        <button class="w3-button w3-block w3-left-align" onclick="openFile()">Open file</button>
+
+
+
+    </div>
+
+
+    <!-- Page Content -->
+    <div class="w3-grey">
+        <button class="w3-button w3-diplay-topleft" onclick="w3_sidebar_open()">☰</button>
+        <div class="w3-container">
+            <div id="canvas-container" class="w3-display-middle">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" style="display: none;">
+
+
+
+
+
 
     <script>
-        vectron_start();
+        let input = document.getElementById("file-input");
+        setCanvas();
+
+        fetch("wrapping.wasm").then(response => response.arrayBuffer())
+            .then(bytes => {
+                gameFile = bytes;
+                vectron_start();
+            });
+
+
+
+        input.onchange = (event) => {
+            input.files[0].arrayBuffer().then(bytes => {
+                gameFile = bytes;
+                vectron_start();
+            });
+        }
+
+        function onDrop(event) {
+
+        }
+
+        function openFile() {
+            input.click();
+        }
+
+        function resize() {
+            setCanvas();
+            vectron_resize();
+        }
+
+
+        function setCanvas() {
+            let canvas = document.getElementById("canvas");
+
+            let size = 512;
+
+            if (window.innerHeight > window.innerWidth) {
+                size = window.innerWidth * 0.9;
+            } else {
+                size = window.innerHeight * 0.9;
+            }
+            canvas.width = size;
+            canvas.height = size;
+        }
+
+        function w3_sidebar_open() {
+            document.getElementById("sidebar").style.display = "block";
+        }
+
+        function w3_sidebar_close() {
+            document.getElementById("sidebar").style.display = "none";
+        }
     </script>
 </body>
+
 </html>
