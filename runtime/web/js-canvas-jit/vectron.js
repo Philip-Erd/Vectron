@@ -1,8 +1,8 @@
 "use strict"
 //config
-const gameFile = "wrapping.wasm"
-const updateTime = 16;
-const audioWaveType = "sine";
+let gameFile = "wrapping.wasm"
+let updateTime = 16;
+let audioWaveType = "sine";
 
 //runtime
 let vectron_canvas;
@@ -12,8 +12,6 @@ let vectron_audioContext = new (window.AudioContext || window.webkitAudioContext
 let vectron_mainGain = null;
 
 let vectron_game_instance;
-let vectron_game_exports;
-let vectron_game_memory = new WebAssembly.Memory({ initial: 10, maximum: 100 });
 
 
 
@@ -51,23 +49,13 @@ let vectron_importObject = {
         setWrapMode: vectron_setWrapMode,
         getInput: vectron_getInput,
         playTone: vectron_playTone
-    },
-
-    vectron: {
-        setPosition: vectron_setPosition,
-        drawLineTo: vectron_drawLineTo,
-        setColor: vectron_setColor,
-        clear: vectron_clear,
-        translate: vectron_translate,
-        scale: vectron_scale,
-        rotate: vectron_rotate,
-        setTransform: vectron_setTransform,
-        push: vectron_push,
-        pop: vectron_pop,
-        setWrapMode: vectron_setWrapMode,
-        getInput: vectron_getInput,
-        playTone: vectron_playTone
     }
+}
+
+//not really working
+function vectron_resize() {
+
+    vectron_canvasContext.strokeStyle = vectron_lineColor;
 }
 
 function vectron_intern_init() {
@@ -96,18 +84,24 @@ function vectron_intern_init() {
     });
 
     //WASM
-    WebAssembly.compileStreaming(fetch(gameFile))
-        .then(module => WebAssembly.instantiate(module, vectron_importObject))
-        .then((instance) => {
-            vectron_game_instance = instance;
-            vectron_game_exports = instance.exports;
 
-            if (typeof vectron_game_exports.init != "undefined") {
-                vectron_game_exports.init();
-            }
+    fetch(gameFile).then(response => response.arrayBuffer())
+        .then(bytes => WebAssembly.instantiate(bytes, vectron_importObject))
+        .then((result) => {
 
-            if (typeof vectron_game_exports.update != "undefined") {
-                window.setInterval(vectron_update, updateTime);
+            if (typeof result != "undefined") {
+
+                vectron_game_instance = result.instance;
+
+                if (typeof vectron_game_instance.exports.init != "undefined") {
+                    vectron_game_instance.exports.init();
+                }
+
+                if (typeof vectron_game_instance.exports.update != "undefined") {
+                    window.setInterval(vectron_update, updateTime);
+                }
+            }else{
+                window.alert("could not compile WASM file");
             }
         });
 
@@ -299,8 +293,8 @@ function vectron_wrapLine(start, end) {
         //horizontal wrapping
         case 1:
 
-            offsetX = Math.max( (Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
-                                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
+            offsetX = Math.max((Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
+                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
             start.x -= offsetX;
             end.x -= offsetX;
 
@@ -314,13 +308,13 @@ function vectron_wrapLine(start, end) {
             }
 
             break;
-        
+
         //vertical wrapping
         case 2:
 
 
-            offsetY = Math.max( (Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
-                                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
+            offsetY = Math.max((Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
+                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
 
             start.y -= offsetY;
             end.y -= offsetY;
@@ -341,11 +335,11 @@ function vectron_wrapLine(start, end) {
 
 
             //offsets
-            offsetX = Math.max( (Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
-                                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
+            offsetX = Math.max((Math.floor(start.x / vectron_canvas.width) * vectron_canvas.width),
+                (Math.floor(end.x / vectron_canvas.width) * vectron_canvas.width));
 
-            offsetY = Math.max( (Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
-                                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
+            offsetY = Math.max((Math.floor(start.y / vectron_canvas.height) * vectron_canvas.height),
+                (Math.floor(end.y / vectron_canvas.height) * vectron_canvas.height));
 
             start.x -= offsetX;
             end.x -= offsetX;
@@ -356,8 +350,8 @@ function vectron_wrapLine(start, end) {
             let startX = start.x;
             let endX = end.x;
 
-            while(start.y < vectron_canvas.height || end.y < vectron_canvas.height){
-                while(start.x < vectron_canvas.width || end.x < vectron_canvas.width){
+            while (start.y < vectron_canvas.height || end.y < vectron_canvas.height) {
+                while (start.x < vectron_canvas.width || end.x < vectron_canvas.width) {
                     lines.push({
                         start: vectron_createVector(start.x, start.y, start.z),
                         end: vectron_createVector(end.x, end.y, end.z)
@@ -370,7 +364,7 @@ function vectron_wrapLine(start, end) {
                 //reset x coordinates
                 start.x = startX;
                 end.x = endX
-                
+
 
                 start.y += vectron_canvas.height;
                 end.y += vectron_canvas.height;
