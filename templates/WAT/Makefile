@@ -1,4 +1,4 @@
-# To compile this you wabt (https://github.com/WebAssembly/wabt)
+# To compile this you need wabt (https://github.com/WebAssembly/wabt)
 
 
 all: main
